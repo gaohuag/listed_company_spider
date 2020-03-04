@@ -1,8 +1,13 @@
-# 链接到数据库
-def connect_to_db_spider_work():
-    import configparser
-    import pymysql
+import configparser
+import random
+import string
+import time
 
+import pymysql
+
+
+# 连接到数据库
+def connect_to_db_spider_work():
     cf = configparser.ConfigParser()
 
     cf.read("configparser.ini")
@@ -25,8 +30,6 @@ def connect_to_db_spider_work():
                          charset=db_charset)
 
     cursor = db.cursor()
-    # sql_check = 'select * from credit_file_info'
-    # print('当前数据库page_1_info中存在', cursor.execute(sql_check), '条记录')
     return db, cursor
 
 
@@ -37,14 +40,12 @@ def quit_connect_to_db_fengniao(db, cursor):
 
 
 # 将数据插入表credit_file_info
-def insert_into_table_credit_file_info(industry_code='', company_code='', industry_type='', company_full_name_CH='',stock_codeA='', stock_codeB=''):
+def insert_into_table_credit_file_info(industry_code='', company_code='', industry_type='', company_full_name_CH='',
+                                       stock_codeA='', stock_codeB='', web_site='', province='', city='',
+                                       register_address='',
+                                       stock_A_listed_time=None,
+                                       company_name=''):
     # 连接配置信息
-    import random
-    import string
-    import pymysql
-    import configparser
-    import time
-
     db, cursor = connect_to_db_spider_work()
     id = ''.join(random.sample(string.ascii_letters + string.digits, 20))
 
@@ -52,12 +53,15 @@ def insert_into_table_credit_file_info(industry_code='', company_code='', indust
     cf.read("configparser.ini")
 
     update_date = time.strftime('%Y-%m-%d', time.localtime(time.time()))
-
+    if stock_A_listed_time == None:
+        stock_A_listed_time = time.strftime('%Y-%m-%d', time.localtime(time.time()))
     sql = """INSERT INTO listed_company
-        (id, industry_code, company_code, industry_type, company_full_name_CH, stock_codeA, stock_codeB, update_date) values
+        (id, industry_code, company_code, industry_type, company_full_name_CH, stock_codeA, stock_codeB, update_date,
+        web_site,province,city,register_address,stock_A_listed_time,company_name) values
         (\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", 
-        \"%s\", \"%s\", \"%s\");""" % \
-          (id, industry_code, company_code, industry_type, company_full_name_CH, stock_codeA, stock_codeB, update_date)
+        \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\");""" % \
+          (id, industry_code, company_code, industry_type, company_full_name_CH, stock_codeA, stock_codeB, update_date,
+           web_site, province, city, register_address, stock_A_listed_time,company_name)
     try:
         cursor.execute(sql)
         db.commit()

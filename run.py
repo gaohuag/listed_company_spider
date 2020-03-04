@@ -1,10 +1,10 @@
-import time
-import monk
-import os
-import csv
-import shutil
 import configparser
+import csv
+import os
+import shutil
+import time
 
+import monk
 import sse
 import szse
 
@@ -16,8 +16,8 @@ if key == '1':
 else:
     data_save_path = cf.get("data_save_path", "service") + '%s/' % time.strftime('%Y%m%d', time.localtime(time.time()))
 
-# 深交所页面李所有上市公司的excel下载地址
-url_szse = "http://www.szse.cn/szseWeb/ShowReport.szse?SHOWTYPE=xlsx&CATALOGID=1110&tab1PAGENO=1&ENCODE=1&TABKEY=tab1"
+# 深交所页面里所有上市公司的excel下载地址
+url_szse = "http://www.szse.cn/api/report/ShowReport?SHOWTYPE=xlsx&CATALOGID=1110&TABKEY=tab1&random=0.45112067813917034"
 today = time.strftime("%Y-%m-%d")
 
 # 合并深交所与上交所两边的数据,并保存为csv文件
@@ -82,4 +82,4 @@ szse.process_xlsx(csv_file_name=full_csv_file_name, xlsx_name=szse_xlsx_name, cs
 if os.path.exists(data_save_path):
     shutil.rmtree(data_save_path)
 
-print('\n>>>成功合并深交所与上交所的所有数据至文件:%s' % szse_xlsx_name)
+print('\n>>>成功合并深交所与上交所的所有数据至文件:%s' % full_csv_file_name)

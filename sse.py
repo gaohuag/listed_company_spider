@@ -1,15 +1,18 @@
 # -*- coding:utf-8 -*-
+import csv
+import json
+from urllib.parse import urljoin
+
+import requests
+from bs4 import BeautifulSoup
+
 import monk
 import sql_process
 
 
 # 读取行业列表
 def get_industry_info(url='http://www.sse.com.cn/assortment/stock/areatrade/trade/'):
-    from bs4 import BeautifulSoup
-    from urllib.parse import urljoin
-    import re
-
-    html = monk.get_html(url=url)
+    html = monk.get_html(url)
     datas = html.find('div', class_="table-responsive sse_table_T01 tdclickable").script.get_text()
 
     # 使用beautifulsoup结构化
@@ -32,10 +35,6 @@ def get_industry_info(url='http://www.sse.com.cn/assortment/stock/areatrade/trad
 
 # 遍历所有公司
 def get_company_info(industry_code, csv_file_name, csv_head):
-    import requests
-    import json
-    import csv
-
     api_url = "http://query.sse.com.cn/security/stock/queryIndustryIndex.do"
     querystring = {"csrcCode": industry_code}
 
@@ -53,6 +52,8 @@ def get_company_info(industry_code, csv_file_name, csv_head):
     datas = json.loads(datas)['result']
 
     for data in datas:
+        # 打印公司数据
+        print("company data:%s" % data)
         company_data = []
 
         company_code = data['companycode']  # 上市公司代码
@@ -69,7 +70,8 @@ def get_company_info(industry_code, csv_file_name, csv_head):
 
         sql_process.insert_into_table_credit_file_info(industry_code=industry_code, company_code=company_code,
                                                        industry_type=industry_type,
-                                                       company_full_name_CH=company_full_name_CH, stock_codeA=stock_codeA,
+                                                       company_full_name_CH=company_full_name_CH,
+                                                       stock_codeA=stock_codeA,
                                                        stock_codeB=stock_codeB)
 
         # 按照顺序准备即将写入csv文件的数据
